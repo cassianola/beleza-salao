@@ -1,77 +1,25 @@
-
 # Beleza Exemplo — Sistema de Agendamento
 
-## Sobre o projeto
-
-O Beleza Exemplo é um sistema web de agendamento desenvolvido como MVP (Produto Mínimo Viável) para auxiliar na gestão de pequenos salões de beleza.
-
-O projeto busca substituir o controle manual de agendamentos por uma plataforma digital, proporcionando maior organização, redução de conflitos de horários e facilidade no gerenciamento de clientes e serviços.
-
-## Objetivos
-
-- Digitalizar os agendamentos do salão.
-- Reduzir conflitos de horários.
-- Facilitar o cadastro e a consulta de clientes.
-- Melhorar a organização dos atendimentos.
-- Otimizar a rotina dos funcionários.
+MVP acadêmico de um sistema web para pequenos salões de beleza. O objetivo é substituir a agenda física e a organização manual por WhatsApp por uma agenda centralizada, reduzindo conflitos e facilitando cancelamentos e remarcações.
 
 ## Funcionalidades
 
-- Login de funcionários.
-- Painel inicial de atendimentos.
-- Cadastro e edição de clientes.
-- Cadastro de serviços.
-- Calendário de agendamentos.
-- Consulta de horários disponíveis.
-- Criação de novos agendamentos.
-- Confirmação, remarcação e cancelamento.
-- Busca por cliente ou serviço.
-- Validação de conflitos de horários.
-- Interface responsiva.
+- Login de funcionário e encerramento de sessão.
+- Painel inicial com total de atendimentos do dia e próximo agendamento.
+- Cadastro, consulta e edição de clientes.
+- Cadastro de serviços com duração e configuração do expediente.
+- Cadastro, consulta, confirmação, edição, remarcação e cancelamento de agendamentos.
+- Filtros por data, cliente, serviço, próximos atendimentos e cancelados.
+- Calendário, horários disponíveis e validação de sobreposição e expediente no servidor.
+- Interface responsiva inspirada nos protótipos acadêmicos.
 
-## Tecnologias utilizadas
+## Tecnologias e arquitetura
 
-- Python 3.12
-- Flask
-- Flask-SQLAlchemy
-- Flask-Login
-- MySQL
-- SQLite
-- HTML5
-- CSS3
-- JavaScript
-- Pytest
-- Git e GitHub
+Python 3.12, Flask 3.1, Flask-SQLAlchemy 3.1, Flask-Login, PyMySQL, MySQL 8.0 (opcionalmente SQLite para demonstração), HTML, CSS próprio, JavaScript e pytest. O projeto segue uma arquitetura monolítica MVC: `models.py` representa o modelo, `routes.py` o controlador e `templates/` as telas. O módulo `domain.py` contém as regras de negócio. A implementação usa CSS próprio em vez de Bootstrap para reproduzir a identidade visual sem depender de CDN.
 
-## Arquitetura do sistema
+## Como executar (Windows)
 
-O projeto utiliza a arquitetura MVC (Model-View-Controller), separando os dados, as regras de negócio e a interface do usuário.
-
-- Model: gerenciamento dos dados.
-- View: interface e apresentação das informações.
-- Controller: processamento das solicitações e controle das funcionalidades.
-
-## Estrutura do projeto
-
-```text
-beleza-salao/
-├── app/
-│   ├── templates/
-│   ├── static/
-│   ├── models.py
-│   ├── routes.py
-│   └── domain.py
-├── tests/
-├── docs/
-├── requirements.txt
-├── docker-compose.yml
-├── run.py
-└── README.md
-```
-
-## Como executar o projeto
-
-Instale o Python 3.12 e execute os comandos abaixo na pasta do projeto:
+Instale Python 3.12 e abra o PowerShell na pasta do projeto:
 
 ```powershell
 python -m venv .venv
@@ -80,46 +28,65 @@ python -m venv .venv
 .\.venv\Scripts\python.exe run.py
 ```
 
-Acesse o sistema pelo navegador:
+Acesse http://127.0.0.1:5000 no navegador.
 
-http://127.0.0.1:5000
+**Usuário demonstrativo:** `funcionario`  
+**Senha demonstrativa:** `beleza123`
 
-## Acesso demonstrativo
+O comando `init-db` cria as tabelas e dados fictícios. A agenda demonstrativa é preenchida para o dia seguinte à inicialização. Acesse a aba Próximos agendamentos ou selecione esse dia. A base SQLite fica em `instance/`, ignorada pelo Git.
 
-- Usuário: funcionario
-- Senha: beleza123
+### Linux/macOS
 
-As credenciais são destinadas exclusivamente à demonstração acadêmica.
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python -m flask --app run init-db
+python run.py
+```
+
+### MySQL 8.0 (alternativa conforme arquitetura proposta)
+
+Com Docker Desktop e Docker Compose instalados, execute `docker compose up -d` e aguarde o banco ficar saudável (`docker compose ps`). No PowerShell:
+
+```powershell
+$env:DATABASE_URL = 'mysql+pymysql://beleza:beleza_local@127.0.0.1:3306/beleza?charset=utf8mb4'
+.\.venv\Scripts\python.exe -m flask --app run init-db
+.\.venv\Scripts\python.exe run.py
+```
+
+As credenciais do Compose são exclusivamente para uso local e acadêmico. Para outros ambientes, configure `DATABASE_URL`, `SECRET_KEY`, `DEMO_USERNAME` e `DEMO_PASSWORD` antes de inicializar o banco. As credenciais demonstrativas não devem ser usadas em produção. A chave de sessão aleatória padrão é adequada apenas para desenvolvimento local, pois muda a cada reinício.
 
 ## Testes
-
-O projeto possui testes unitários e de integração para verificar as regras de negócio e as principais funcionalidades do sistema.
-
-Para executar os testes:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-## Versionamento
+O workflow `.github/workflows/tests.yml` instala as dependências e roda os testes a cada push ou pull request no GitHub. Os testes incluem regras de conflito, horário de funcionamento, login, agendamento, remarcação, cancelamento, clientes e disponibilidade.
 
-O Git e o GitHub são utilizados para controlar as alterações do código-fonte e registrar a evolução do desenvolvimento.
+## Estrutura
 
-## Resultados esperados
+```text
+app/
+  __init__.py       # aplicação, sessão, CSRF e inicialização
+  models.py         # entidades e banco de dados
+  routes.py         # controladores e rotas HTTP
+  domain.py         # regras de negócio
+  templates/        # páginas HTML/Jinja
+  static/           # CSS e JavaScript
+tests/              # testes unitários e de integração
+docs/               # documentação acadêmica
+.github/workflows/  # integração contínua
+run.py              # ponto de entrada
+requirements.txt    # dependências
+docker-compose.yml  # opção de banco MySQL
+```
 
-Espera-se que o sistema contribua para a melhoria da organização dos atendimentos, redução de erros operacionais e maior eficiência no gerenciamento da agenda do salão.
+## Limites do MVP
 
-## Melhorias futuras
+Agenda única do salão (um atendimento por vez); sem pagamentos, notificações automáticas, controle financeiro, recuperação de senha ou perfis de múltiplos profissionais. A prevenção de conflitos é feita na aplicação, adequada à demonstração de um operador; concorrência simultânea em produção exigiria proteção transacional adicional. Não é um serviço hospedado nem um sistema pronto para produção. Use somente dados fictícios no repositório público.
 
-- Agendamento online pelos clientes.
-- Notificações automáticas.
-- Integração com WhatsApp.
-- Controle financeiro.
-- Gerenciamento de múltiplos profissionais.
-- Relatórios de atendimento.
+## Publicação
 
-## Finalidade acadêmica
-
-Este projeto foi desenvolvido para fins acadêmicos, aplicando conhecimentos de engenharia de software, desenvolvimento web, banco de dados, testes e versionamento de código.
-
-O sistema utiliza dados fictícios e não está destinado ao uso em produção.
+Consulte [docs/PUBLICAR.md](docs/PUBLICAR.md) para enviar este projeto ao GitHub preservando o histórico de commits.
